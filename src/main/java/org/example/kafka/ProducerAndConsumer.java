@@ -4,6 +4,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.example.redis.RedisService;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,13 +53,17 @@ public final class ProducerAndConsumer {
     }
 
     private void send() {
-        try (final KafkaProducer<String, String> producer = new KafkaProducer<>(SEND_PROPERTIES)) {
+        try (
+            final KafkaProducer<String, String> producer = new KafkaProducer<>(SEND_PROPERTIES);
+            final var redisService = new RedisService()
+        ) {
             final var count = counter.getAndIncrement();
-            final ProducerRecord<String, String> record = new ProducerRecord<>(
-                topic,
-                "key" + count % 3,
-                "Hello from Gradle! Counter: " + count
-            );
+            final var storedMessage = redisService.getMessage(String.valueOf(count));
+            final var message = (storedMessage == null)
+                ? "Hello from Kafka and Redis!"
+                : storedMessage;
+
+            final var record = new ProducerRecord<>(topic, "key" + count % 3, message + "; Counter: " + count);
             producer.send(record);
         } catch (Exception e) {
             // Not need handle
@@ -66,17 +71,23 @@ public final class ProducerAndConsumer {
     }
 
     private void receive() {
-        try (final KafkaConsumer<String, String> consumer = new KafkaConsumer<>(RECIEVE_PROPERTIES)) {
+        try (
+            final KafkaConsumer<String, String> consumer = new KafkaConsumer<>(RECIEVE_PROPERTIES);
+            final var redisService = new RedisService()
+        ) {
             consumer.subscribe(Collections.singletonList(topic));
 
             while (true) {
                 final ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
-                records.forEach(record -> System.out.printf(
-                    "Key: %s, Value: %s (Partition: %d)%n",
-                    record.key(),
-                    record.value(),
-                    record.partition()
-                ));
+                records.forEach(record -> {
+                    redisService.saveMessage("{msg}:" + counter.get(), record.value());
+                    System.out.printf(
+                        "Key: %s, Value: %s (Partition: %d)%n",
+                        record.key(),
+                        record.value(),
+                        record.partition()
+                    );
+                });
 
                 if (!records.isEmpty()) {
                     return;
