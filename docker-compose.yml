@@ -1,14 +1,16 @@
-version: '3'
+version: '3.9'
 services:
   Kafka:
-    image: confluentinc/cp-kafka:latest
+    image: ${KAFKA_IMAGE}
+    container_name: ${KAFKA_CONTAINER}
     ports:
-      - "9092:9092"
+      - "${EXTERNAL_PORT}:9092"
     environment:
       # 1. Добавляем роли (брокер и контроллер в одном флаконе)
       - KAFKA_NODE_ID=1
       - KAFKA_PROCESS_ROLES=broker,controller
-      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093
+      - KAFKA_CLUSTER_ID=${KAFKA_CLUSTER_ID}
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@Kafka:9093
 
       # 2. Настройка слушателей
       - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
@@ -19,3 +21,18 @@ services:
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - app-network
+
+  Redis:
+    image: ${REDIS_IMAGE}
+    container_name: ${REDIS_CONTAINER}
+    ports:
+      - "${REDIS_PORT}:6379"
+    command: redis-server --appendonly yes
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
