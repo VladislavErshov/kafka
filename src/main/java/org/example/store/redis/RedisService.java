@@ -1,11 +1,13 @@
 package org.example.store.redis;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.UnifiedJedis;
 
+@Slf4j
 public final class RedisService implements AutoCloseable {
 
     private static final String MESSAGE_KEY = "msg:";
@@ -19,13 +21,13 @@ public final class RedisService implements AutoCloseable {
         final int port = Integer.parseInt(dotenv.get("REDIS_PORT", "6379"));
 
         this.jedis = new UnifiedJedis("redis://" + host + ":" + port);
-        System.out.println("Connected to Redis on " + host + ":" + port);
+        log.info("Connected to Redis on {}:{}", host, port);
     }
 
     public void saveMessage(@NotNull String messageId, @NotNull String content) {
         final var key = MESSAGE_KEY + messageId;
         jedis.set(key, content);
-        System.out.println("Message stored in Redis with key: " + key);
+        log.info("Message stored in Redis with key: {}", key);
     }
 
     @Contract(pure = true)
@@ -36,6 +38,6 @@ public final class RedisService implements AutoCloseable {
     @Override
     public void close() {
         jedis.close();
-        System.out.println("Redis connection successfully closed");
+        log.info("Redis connection successfully closed");
     }
 }

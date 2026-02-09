@@ -1,5 +1,6 @@
 package org.example.kafka;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -13,6 +14,7 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 public final class ProducerAndConsumer {
 
     private static final Properties SEND_PROPERTIES = createSendProperties();
@@ -65,8 +67,10 @@ public final class ProducerAndConsumer {
 
             final var record = new ProducerRecord<>(topic, "key" + count % 3, message + "; Counter: " + count);
             producer.send(record);
+
+            log.info("Send message '{}'", message);
         } catch (Exception e) {
-            // Not need handle
+            log.info("Errors while send");
         }
     }
 
@@ -81,8 +85,8 @@ public final class ProducerAndConsumer {
                 final ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
                 records.forEach(record -> {
                     redisService.saveMessage("{msg}:" + counter.get(), record.value());
-                    System.out.printf(
-                        "Key: %s, Value: %s (Partition: %d)%n",
+                    log.info(
+                        "Receive message with Key: {}, Value: {} (Partition: {})",
                         record.key(),
                         record.value(),
                         record.partition()
@@ -93,6 +97,8 @@ public final class ProducerAndConsumer {
                     return;
                 }
             }
+        } catch (Exception e) {
+            log.info("Errors while receive");
         }
     }
 }
