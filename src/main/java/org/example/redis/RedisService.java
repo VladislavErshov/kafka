@@ -2,6 +2,7 @@ package org.example.redis;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.UnifiedJedis;
 
 public final class RedisService implements AutoCloseable {
@@ -27,7 +28,7 @@ public final class RedisService implements AutoCloseable {
         System.out.println("Message stored in Redis with key: " + key);
     }
 
-    public String getMessage(@NotNull String messageId) {
+    public @Nullable String getMessage(@NotNull String messageId) {
         return jedis.get(MESSAGE_KEY + messageId);
     }
 
