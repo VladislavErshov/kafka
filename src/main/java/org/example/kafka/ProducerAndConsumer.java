@@ -4,7 +4,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.example.redis.RedisService;
+import org.example.store.redis.RedisService;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,6 +1,7 @@
-package org.example.redis;
+package org.example.store.redis;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.UnifiedJedis;
@@ -11,13 +12,12 @@ public final class RedisService implements AutoCloseable {
 
     private final @NotNull UnifiedJedis jedis;
 
+    @Contract(pure = true)
     public RedisService() {
-        // Load environment variables from .env file
         final var dotenv = Dotenv.load();
         final var host = "127.0.0.1";
         final int port = Integer.parseInt(dotenv.get("REDIS_PORT", "6379"));
 
-        // Initialize UnifiedJedis for Standalone mode connection
         this.jedis = new UnifiedJedis("redis://" + host + ":" + port);
         System.out.println("Connected to Redis on " + host + ":" + port);
     }
@@ -28,6 +28,7 @@ public final class RedisService implements AutoCloseable {
         System.out.println("Message stored in Redis with key: " + key);
     }
 
+    @Contract(pure = true)
     public @Nullable String getMessage(@NotNull String messageId) {
         return jedis.get(MESSAGE_KEY + messageId);
     }
@@ -35,6 +36,6 @@ public final class RedisService implements AutoCloseable {
     @Override
     public void close() {
         jedis.close();
-        System.out.println("Redis connection successfully closed.");
+        System.out.println("Redis connection successfully closed");
     }
 }
