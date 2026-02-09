@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  Redis:
+    image: ${REDIS_IMAGE}
+    container_name: ${REDIS_CONTAINER}
+    ports:
+      - "${REDIS_PORT}:6379"
+    # Run in standalone mode with persistence
+    command: redis-server --appendonly yes
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
