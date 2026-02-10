@@ -19,7 +19,8 @@ public final class ClickHouseService implements AutoCloseable {
 
     @Contract(pure = true)
     public ClickHouseService() throws SQLException {
-        final var dotenv = Dotenv.load();
+        final var dotenv = Dotenv.configure().filename("config.env").load();
+        final var secrets = Dotenv.configure().filename(".env").load();
 
         final var host = "127.0.0.1";
         final var port = dotenv.get("CLICKHOUSE_HTTP_PORT", "8123");
@@ -28,7 +29,7 @@ public final class ClickHouseService implements AutoCloseable {
         final var properties = new Properties();
         final var user = dotenv.get("CLICKHOUSE_USER", "default");
         properties.setProperty("user", user);
-        properties.setProperty("password", dotenv.get("CLICKHOUSE_PASSWORD", ""));
+        properties.setProperty("password", secrets.get("CLICKHOUSE_PASSWORD", ""));
 
         this.dataSource = new ClickHouseDataSource(url, properties);
         log.info("Connected to ClickHouse on {}:{} as user {}", host, port, user);

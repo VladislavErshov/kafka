@@ -6,7 +6,6 @@ services:
     container_name: ${REDIS_CONTAINER}
     ports:
       - "${REDIS_PORT}:6379"
-    # Run in standalone mode with persistence
     command: redis-server --appendonly yes
     networks:
       - app-network

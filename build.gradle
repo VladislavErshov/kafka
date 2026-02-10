@@ -14,15 +14,19 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.42'
     annotationProcessor 'org.projectlombok:lombok:1.18.42'
 
+    // Dotenv
     implementation 'org.slf4j:slf4j-simple:2.0.16'
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 
+    // ClickHouse
     implementation 'com.clickhouse:clickhouse-jdbc:0.6.5'
     implementation 'com.clickhouse:clickhouse-client:0.6.5'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
 
+    // Redis
     implementation 'redis.clients:jedis:7.1.0'
 
+    // Kafka
     implementation 'org.apache.kafka:kafka-clients:3.9.1'
 
     testImplementation platform('org.junit:junit-bom:5.11.4')

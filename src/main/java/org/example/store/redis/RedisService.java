@@ -16,7 +16,7 @@ public final class RedisService implements AutoCloseable {
 
     @Contract(pure = true)
     public RedisService() {
-        final var dotenv = Dotenv.load();
+        final var dotenv = Dotenv.configure().filename("config.env").load();
         final var host = "127.0.0.1";
         final int port = Integer.parseInt(dotenv.get("REDIS_PORT", "6379"));
 

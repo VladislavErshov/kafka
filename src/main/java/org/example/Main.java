@@ -17,7 +17,7 @@ public final class Main {
             //
         }
 
-//        final var producerAndConsumer = new ProducerAndConsumer();
-//        producerAndConsumer.run();
+        final var producerAndConsumer = new ProducerAndConsumer();
+        producerAndConsumer.run();
     }
 }

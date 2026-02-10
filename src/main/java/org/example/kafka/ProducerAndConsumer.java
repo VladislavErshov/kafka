@@ -21,9 +21,9 @@ public final class ProducerAndConsumer {
 
     private static final Properties RECIEVE_PROPERTIES = createRecieveProperties();
 
-    private final AtomicInteger counter = new AtomicInteger(0);
+    private static final String topic = "multi-part-topic";
 
-    private final String topic = "multi-part-topic";
+    private final AtomicInteger counter = new AtomicInteger(0);
 
     @Contract(pure = true)
     private static @NotNull Properties createSendProperties() {
