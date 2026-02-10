@@ -70,7 +70,7 @@ public final class ProducerAndConsumer {
 
             log.info("Send message '{}'", message);
         } catch (Exception e) {
-            log.info("Errors while send");
+            log.error("Errors while send {}", e.getMessage(), e);
         }
     }
 
@@ -98,7 +98,7 @@ public final class ProducerAndConsumer {
                 }
             }
         } catch (Exception e) {
-            log.info("Errors while receive");
+            log.error("Errors while receive {}", e.getMessage(), e);
         }
     }
 }
