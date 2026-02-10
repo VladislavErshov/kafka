@@ -1,0 +1,46 @@
+services:
+  ClickHouse:
+    image: ${CLICKHOUSE_IMAGE}
+    container_name: ${CLICKHOUSE_CONTAINER_NAME}
+    ports:
+      - "${CLICKHOUSE_HTTP_PORT}:8123"
+      - "${CLICKHOUSE_NATIVE_PORT}:9000"
+    environment:
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  hackernews-loader:
+    image: ${HACKERNEWS_LOADER_IMAGE}
+    container_name: ${HACKERNEWS_LOADER_CONTAINER_NAME}
+    volumes:
+      - .:/app
+    working_dir: /app
+    depends_on:
+      ClickHouse:
+        condition: service_healthy
+    networks:
+      - app-network
+    environment:
+      - CH_HOST=ClickHouse
+      - CH_PORT=8123
+      - CH_USER=${CLICKHOUSE_USER}
+      - CH_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - HN_LIMIT=${HACKERNEWS_LOAD_LIMIT}
+      - HN_TOP_URL=${HACKERNEWS_TOP_STORIES_URL}
+      - HN_ITEM_URL=${HACKERNEWS_ITEM_BASE_URL}
+    entrypoint: >
+      sh -c "
+      pip install --no-cache-dir requests clickhouse-connect &&
+      python -u load_data.py
+      "
+
+networks:
+  app-network:
+    external: true

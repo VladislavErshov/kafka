@@ -3,6 +3,7 @@ version: '3.9'
 include:
   - path: docker-compose.kafka.yml
   - path: docker-compose.redis.yml
+  - path: docker-compose.clickhouse.yml
 
 networks:
   app-network:
