@@ -23,6 +23,12 @@ dependencies {
     implementation 'com.clickhouse:clickhouse-client:0.6.5'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.3.1'
 
+    // Qdrant
+    implementation 'io.qdrant:client:1.13.0'
+    implementation 'io.grpc:grpc-netty-shaded:1.75.0'
+    implementation 'com.google.guava:guava:33.0.0-jre'
+    implementation 'com.google.protobuf:protobuf-java:4.28.2'
+
     // Redis
     implementation 'redis.clients:jedis:7.1.0'
 

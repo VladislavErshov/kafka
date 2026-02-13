@@ -4,6 +4,9 @@ include:
   - path: docker-compose.kafka.yml
   - path: docker-compose.redis.yml
   - path: docker-compose.clickhouse.yml
+#  - path: docker-compose.qdrant.yml
+  - path: docker-compose.vectorizer.yml
+  - path: docker-compose.loader.yml
 
 networks:
   app-network:

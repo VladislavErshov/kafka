@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  hackernews-vectorizer:
+    build:
+      context: ./vectorizer
+      args:
+        - MODEL_NAME=${EMBEDDING_MODEL_NAME:-BAAI/bge-small-en-v1.5}
+    container_name: hackernews-vectorizer
+    environment:
+      - KAFKA_CONTAINER=${KAFKA_CONTAINER}
+      - EXTERNAL_PORT=${EXTERNAL_PORT}
+      - KAFKA_INPUT_TOPIC=${KAFKA_INPUT_TOPIC}
+      - KAFKA_VECTORIZED_TOPIC=${KAFKA_VECTORIZED_TOPIC}
+      - KAFKA_GROUP_ID=${KAFKA_GROUP_ID}
+      - EMBEDDING_MODEL_NAME=${EMBEDDING_MODEL_NAME}
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    external: true

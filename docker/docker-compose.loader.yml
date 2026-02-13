@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  hackernews-loader:
+    build:
+      context: ./loader
+    container_name: ${HACKERNEWS_LOADER_CONTAINER_NAME}
+    depends_on:
+      kafka:
+        condition: service_started
+    networks:
+      - app-network
+    environment:
+      - KAFKA_CONTAINER=${KAFKA_CONTAINER}
+      - KAFKA_INPUT_TOPIC=${KAFKA_INPUT_TOPIC}
+      - HN_LIMIT=${HACKERNEWS_LOAD_LIMIT}
+      - HN_TOP_URL=${HACKERNEWS_TOP_STORIES_URL}
+      - HN_ITEM_URL=${HACKERNEWS_ITEM_BASE_URL}
+    restart: "no"
+
+networks:
+  app-network:
+    external: true
