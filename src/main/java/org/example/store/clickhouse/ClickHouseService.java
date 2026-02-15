@@ -37,9 +37,11 @@ public final class ClickHouseService implements AutoCloseable {
 
     @Contract(pure = true)
     public @NotNull List<HackerNewsItem> getTopStories(int limit) {
+        initTable();
+
         final List<HackerNewsItem> stories = new ArrayList<>();
         final var sql =
-            String.format("SELECT id, title, url, score, by, time FROM hackernews ORDER BY score DESC LIMIT %d", limit);
+            String.format("SELECT id, title, url, score, author, time FROM hackernews ORDER BY score DESC LIMIT %d", limit);
 
         try (
             final var connection = dataSource.getConnection();
@@ -52,7 +54,7 @@ public final class ClickHouseService implements AutoCloseable {
                     result.getString("title"),
                     result.getString("url"),
                     result.getInt("score"),
-                    result.getString("by"),
+                    result.getString("author"),
                     result.getTimestamp("time")
                 ));
             }
@@ -63,6 +65,53 @@ public final class ClickHouseService implements AutoCloseable {
         }
 
         return stories;
+    }
+
+    public void insertBatch(@NotNull List<HackerNewsItem> items) {
+        initTable();
+
+        final var sql = "INSERT INTO hackernews (id, title, url, score, author, time) VALUES (?, ?, ?, ?, ?, ?)";
+        try (var connection = dataSource.getConnection();
+             var statement = connection.prepareStatement(sql)
+        ) {
+            for (var item : items) {
+                statement.setLong(1, item.id());
+                statement.setString(2, item.title());
+                statement.setString(3, item.url());
+                statement.setInt(4, item.score());
+                statement.setString(5, item.author());
+                statement.setTimestamp(6, item.time());
+                statement.addBatch();
+            }
+            statement.executeBatch();
+
+            log.info("Batch inserted {} items to ClickHouse", items.size());
+        } catch (SQLException e) {
+            log.error("ClickHouse batch insert failed: {}", e.getMessage());
+        }
+    }
+
+    private void initTable() {
+        final var sql = """
+        CREATE TABLE IF NOT EXISTS hackernews (
+            id UInt64,
+            title String,
+            url String,
+            score Int32,
+            author String,
+            time DateTime
+        ) ENGINE = MergeTree() 
+        ORDER BY id""";
+
+        try (
+            final var connection = dataSource.getConnection();
+            final var statement = connection.createStatement()
+        ) {
+            statement.execute(sql);
+            log.info("Table 'hackernews' is ready");
+        } catch (SQLException e) {
+            log.error("Failed to initialize table: {}", e.getMessage());
+        }
     }
 
     @Override

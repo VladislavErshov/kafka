@@ -5,7 +5,8 @@ services:
     image: ${KAFKA_IMAGE}
     container_name: ${KAFKA_CONTAINER}
     ports:
-      - "${EXTERNAL_PORT}:9092"
+      - "${INTERNAL_PORT}:9092"
+      - "${EXTERNAL_PORT}:9094"
     environment:
       - KAFKA_NODE_ID=1
       - KAFKA_PROCESS_ROLES=broker,controller
